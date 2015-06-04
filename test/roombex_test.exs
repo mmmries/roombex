@@ -2,48 +2,48 @@ defmodule RoombexTest do
   use ExUnit.Case
 
   test "start command" do
-    assert Roombex.start == [128]
+    assert Roombex.start == << 128 >>
   end
 
   test "baud command" do
-    assert Roombex.baud(2_400) == [129,3]
+    assert Roombex.baud(2_400) == << 129,3 >>
   end
 
   test "control command" do
-    assert Roombex.control == [130]
+    assert Roombex.control == << 130 >>
   end
 
   test "safe command" do
-    assert Roombex.safe == [131]
+    assert Roombex.safe == << 131 >>
   end
 
   test "full command" do
-    assert Roombex.full == [132]
+    assert Roombex.full == << 132 >>
   end
 
   test "power command" do
-    assert Roombex.power == [133]
+    assert Roombex.power == << 133 >>
   end
 
   test "spot command" do
-    assert Roombex.spot == [134]
+    assert Roombex.spot == << 134 >>
   end
 
   test "clean command" do
-    assert Roombex.clean == [135]
+    assert Roombex.clean == << 135 >>
   end
 
   test "max command" do
-    assert Roombex.max == [136]
+    assert Roombex.max == << 136 >>
   end
 
   test "drive command" do
-    assert Roombex.drive(-200, 500) == [137, 255, 56, 1, 244]
+    assert Roombex.drive(-200, 500) == << 137, 255, 56, 1, 244 >>
   end
 
   test "drive command special cases" do
-    assert Roombex.drive(:straight) == [137, 8, 0, 0, 0]
-    assert Roombex.drive(:turn_clockwise) == [137, 255, 255, 255, 255]
-    assert Roombex.drive(:turn_counter_clockwise) == [137, 0, 0, 0, 1]
+    assert Roombex.drive(:straight) == << 137, 8, 0, 0, 0 >>
+    assert Roombex.drive(:turn_clockwise) == << 137, 255, 255, 255, 255 >>
+    assert Roombex.drive(:turn_counter_clockwise) == << 137, 0, 0, 0, 1 >>
   end
 end
