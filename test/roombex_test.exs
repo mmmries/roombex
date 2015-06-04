@@ -36,4 +36,14 @@ defmodule RoombexTest do
   test "max command" do
     assert Roombex.max == [136]
   end
+
+  test "drive command" do
+    assert Roombex.drive(-200, 500) == [137, 255, 56, 1, 244]
+  end
+
+  test "drive command special cases" do
+    assert Roombex.drive(:straight) == [137, 8, 0, 0, 0]
+    assert Roombex.drive(:turn_clockwise) == [137, 255, 255, 255, 255]
+    assert Roombex.drive(:turn_counter_clockwise) == [137, 0, 0, 0, 1]
+  end
 end
