@@ -46,4 +46,9 @@ defmodule RoombexTest do
     assert Roombex.drive(:turn_clockwise) == << 137, 255, 255, 255, 255 >>
     assert Roombex.drive(:turn_counter_clockwise) == << 137, 0, 0, 0, 1 >>
   end
+
+  test "motors command" do
+    assert Roombex.motors([:main_brush, :side_brush]) == << 138, 5 >>
+    assert Roombex.motors([:side_brush]) == << 138, 1 >>
+  end
 end

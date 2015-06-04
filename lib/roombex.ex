@@ -12,6 +12,7 @@ defmodule Roombex do
   end
   def full, do: << 132 >>
   def max, do: << 136 >>
+  def motors(which_motors), do: << 138, motors_byte(which_motors, 0) >>
   def power, do: << 133 >>
   def safe, do: << 131 >>
   def spot, do: << 134 >>
@@ -29,6 +30,11 @@ defmodule Roombex do
   defp baud_code(38_400), do: 9
   defp baud_code(57_600), do: 10
   defp baud_code(115_200), do: 11
+
+  defp motors_byte([], byte), do: byte
+  defp motors_byte([:main_brush|tail], byte), do: motors_byte(tail, byte ||| 4)
+  defp motors_byte([:vacuum|tail], byte), do: motors_byte(tail, byte ||| 2)
+  defp motors_byte([:side_brush|tail], byte), do: motors_byte(tail, byte ||| 1)
 
   defp radius_bytes(mm) when mm >= -2000 and mm <= 2000 do
     << mm::16-signed-integer >>
