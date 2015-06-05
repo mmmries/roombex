@@ -51,4 +51,8 @@ defmodule RoombexTest do
     assert Roombex.motors([:main_brush, :side_brush]) == << 138, 5 >>
     assert Roombex.motors([:side_brush]) == << 138, 1 >>
   end
+
+  test "leds command" do
+    assert Roombex.leds([:dirt_detect, :spot, :status_red], 0.0, 0.5) == << 139, 25, 0, 128 >>
+  end
 end

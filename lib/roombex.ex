@@ -11,6 +11,9 @@ defmodule Roombex do
     << 137 >> <> velocity_bytes(velocity_mm_per_sec) <> radius_bytes(radius_mm)
   end
   def full, do: << 132 >>
+  def leds(leds, power_color, power_intensity) do
+    << 139, leds_byte(leds, 0), float_to_byte(power_color), float_to_byte(power_intensity) >>
+  end
   def max, do: << 136 >>
   def motors(which_motors), do: << 138, motors_byte(which_motors, 0) >>
   def power, do: << 133 >>
@@ -30,6 +33,18 @@ defmodule Roombex do
   defp baud_code(38_400), do: 9
   defp baud_code(57_600), do: 10
   defp baud_code(115_200), do: 11
+
+  defp float_to_byte(float) when float >= 0.0 and float <= 1.0 do
+    Float.round( 255.0 * float ) |> trunc
+  end
+
+  defp leds_byte([], byte), do: byte
+  defp leds_byte([:dirt_detect|tail], byte), do: leds_byte(tail, byte ||| 1)
+  defp leds_byte([:max|tail], byte), do: leds_byte(tail, byte ||| 2)
+  defp leds_byte([:clean|tail], byte), do: leds_byte(tail, byte ||| 4)
+  defp leds_byte([:spot|tail], byte), do: leds_byte(tail, byte ||| 8)
+  defp leds_byte([:status_red|tail], byte), do: leds_byte(tail, byte ||| 16)
+  defp leds_byte([:status_green|tail], byte), do: leds_byte(tail, byte ||| 32)
 
   defp motors_byte([], byte), do: byte
   defp motors_byte([:main_brush|tail], byte), do: motors_byte(tail, byte ||| 4)
