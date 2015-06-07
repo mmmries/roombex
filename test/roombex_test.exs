@@ -55,4 +55,9 @@ defmodule RoombexTest do
   test "leds command" do
     assert Roombex.leds([:dirt_detect, :spot, :status_red], 0.0, 0.5) == << 139, 25, 0, 128 >>
   end
+
+  test "song command" do
+    song = [[31, 0.5], [95, 0.75], [65, 0.25]]
+    assert Roombex.song(4, song) == << 140, 4, 3, 31, 32, 95, 48, 65, 16 >>
+  end
 end

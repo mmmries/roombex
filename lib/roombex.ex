@@ -18,6 +18,9 @@ defmodule Roombex do
   def motors(which_motors), do: << 138, motors_byte(which_motors, 0) >>
   def power, do: << 133 >>
   def safe, do: << 131 >>
+  def song(number, notes) when number >= 0 and number <= 15 and length(notes) <= 16 do
+    << 140, number, length(notes) >> <> notes_bytes(notes, << >>)
+  end
   def spot, do: << 134 >>
   def start, do: << 128 >>
 
@@ -45,6 +48,12 @@ defmodule Roombex do
   defp leds_byte([:spot|tail], byte), do: leds_byte(tail, byte ||| 8)
   defp leds_byte([:status_red|tail], byte), do: leds_byte(tail, byte ||| 16)
   defp leds_byte([:status_green|tail], byte), do: leds_byte(tail, byte ||| 32)
+
+  defp notes_bytes([], bytes), do: bytes
+  defp notes_bytes([ [note, duration] | tail ], bytes) when note >= 31 and note <= 127 and duration >= 0.0 and duration <= 3.99 do
+    duration_byte = Float.round( 64.0 * duration ) |> trunc
+    notes_bytes(tail, bytes <> <<note, duration_byte>>)
+  end
 
   defp motors_byte([], byte), do: byte
   defp motors_byte([:main_brush|tail], byte), do: motors_byte(tail, byte ||| 4)
