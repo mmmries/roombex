@@ -16,6 +16,9 @@ defmodule Roombex do
   end
   def max, do: << 136 >>
   def motors(which_motors), do: << 138, motors_byte(which_motors, 0) >>
+  def play(number) when number >= 0 and number <= 15 do
+    << 141, number >>
+  end
   def power, do: << 133 >>
   def safe, do: << 131 >>
   def song(number, notes) when number >= 0 and number <= 15 and length(notes) <= 16 do

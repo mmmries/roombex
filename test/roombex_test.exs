@@ -60,4 +60,8 @@ defmodule RoombexTest do
     song = [[31, 0.5], [95, 0.75], [65, 0.25]]
     assert Roombex.song(4, song) == << 140, 4, 3, 31, 32, 95, 48, 65, 16 >>
   end
+
+  test "play command" do
+    assert Roombex.play(4) == << 141, 4 >>
+  end
 end
