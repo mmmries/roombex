@@ -64,4 +64,11 @@ defmodule RoombexTest do
   test "play command" do
     assert Roombex.play(4) == << 141, 4 >>
   end
+
+  test "sensors command" do
+    assert Roombex.sensors(:all) == << 142 , 0 >>
+    assert Roombex.sensors(:sensors) == << 142 , 1 >>
+    assert Roombex.sensors(:interface) == << 142 , 2 >>
+    assert Roombex.sensors(:electronics) == << 142 , 3 >>
+  end
 end

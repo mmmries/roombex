@@ -20,6 +20,10 @@ defmodule Roombex do
     << 141, number >>
   end
   def power, do: << 133 >>
+  def sensors(:all), do: << 142, 0 >>
+  def sensors(:sensors), do: << 142, 1 >>
+  def sensors(:interface), do: << 142, 2 >>
+  def sensors(:electronics), do: << 142, 3 >>
   def safe, do: << 131 >>
   def song(number, notes) when number >= 0 and number <= 15 and length(notes) <= 16 do
     << 140, number, length(notes) >> <> notes_bytes(notes, << >>)
