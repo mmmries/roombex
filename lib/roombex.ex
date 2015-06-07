@@ -10,6 +10,7 @@ defmodule Roombex do
   def drive(velocity_mm_per_sec, radius_mm) do
     << 137 >> <> velocity_bytes(velocity_mm_per_sec) <> radius_bytes(radius_mm)
   end
+  def force_seeking_dock, do: << 143 >>
   def full, do: << 132 >>
   def leds(leds, power_color, power_intensity) do
     << 139, leds_byte(leds, 0), float_to_byte(power_color), float_to_byte(power_intensity) >>

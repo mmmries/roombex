@@ -71,4 +71,8 @@ defmodule RoombexTest do
     assert Roombex.sensors(:interface) == << 142 , 2 >>
     assert Roombex.sensors(:electronics) == << 142 , 3 >>
   end
+
+  test "force seeking dock" do
+    assert Roombex.force_seeking_dock == << 143 >>
+  end
 end
