@@ -27,6 +27,8 @@ defmodule Roombex.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [
+      {:"erlang-serial", github: "knewter/erlang-serial"}
+    ]
   end
 end
