@@ -5,6 +5,7 @@ defmodule Roombex do
   def clean, do: << 135 >>
   def control, do: << 130 >>
   def drive(:straight), do: << 137, 8, 0, 0, 0 >>
+  def drive(:stop), do: << 137 >> <> velocity_bytes(0) <> radius_bytes(0)
   def drive(:turn_clockwise), do: << 137, 255, 255, 255, 255 >>
   def drive(:turn_counter_clockwise), do: << 137, 0, 0, 0, 1 >>
   def drive(velocity_mm_per_sec, radius_mm) do

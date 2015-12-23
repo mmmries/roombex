@@ -49,6 +49,7 @@ defmodule Roombex.DJ do
     :timer.sleep(100)
     send device, {:send, Roombex.drive(:turn_counter_clockwise)}
     :timer.sleep(100)
+    send device, {:send, Roombex.drive(:stop)}
     {:noreply, device}
   end
 
