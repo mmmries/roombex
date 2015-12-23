@@ -2,10 +2,16 @@ defmodule Roombex.DJ do
   require Logger
   use GenServer
 
-  def start_link(tty_device) do
-    GenServer.start_link(__MODULE__, tty_device)
+  # Client Interface
+  def start_link(tty_device, opts \\ []) do
+    GenServer.start_link(__MODULE__, tty_device, opts)
   end
 
+  def blink(pid \\ __MODULE__), do: GenServer.cast(pid, :blink)
+  def command(pid \\ __MODULE__, binary), do: GenServer.cast(pid, {:command, binary})
+  def shimmy(pid \\ __MODULE__), do: GenServer.cast(pid, :shimmy)
+
+  # GenServer Callbacks
   def init(tty_device) do
     device = :serial.start([speed: 57_600, open: :erlang.bitstring_to_list(tty_device)])
     send device, {:send, Roombex.start}
@@ -13,6 +19,11 @@ defmodule Roombex.DJ do
     send device, {:send, Roombex.safe}
     :timer.sleep(50)
     {:ok, device}
+  end
+
+  def handle_cast({:command, binary}, device) do
+    send device, {:send, binary}
+    {:noreply, device}
   end
 
   def handle_cast(:blink, device) do
