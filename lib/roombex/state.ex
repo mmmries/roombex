@@ -28,11 +28,26 @@ defmodule Roombex.State do
             expected_sensor_packets: [],
             unparsed_binary: <<>>,
             mode: :PASSIVE
-  import Roombex.Sensor, only: [parse: 2]
+  import Roombex.Sensor, only: [parse: 2, packet_size: 1]
 
-  def update(%Roombex.State{sensors: sensors, expected_sensor_packets: [packet|expected]}=state, binary) do
-    new_sensor_values = parse(packet, binary)
-    sensors = Map.merge(sensors, new_sensor_values)
-    %{state | sensors: sensors, expected_sensor_packets: expected}
+  def update(%Roombex.State{sensors: sensors}=state, binary) do
+    binary = state.unparsed_binary <> binary
+    {parsed_sensor_values, unparsed_binary, unparsed_packets} = parse_expected_updates(binary, state.expected_sensor_packets)
+    sensors = Map.merge(sensors, parsed_sensor_values)
+    %{state | sensors: sensors, expected_sensor_packets: unparsed_packets, unparsed_binary: unparsed_binary}
+  end
+
+  defp parse_expected_updates(<<>>, expected_sensor_packets), do: {%{}, <<>>, expected_sensor_packets}
+  defp parse_expected_updates(_rest, []), do: {%{}, <<>>, []}
+  defp parse_expected_updates(binary, [next | rest]) do
+    data_size = packet_size(next)
+    if byte_size(binary) >= data_size do
+      << sensor_data::binary-size(data_size), unparsed_binary::binary >> = binary
+      sensor_updates = parse(next, sensor_data)
+      { other_updates, unparsed_binary, expected_sensor_packets } = parse_expected_updates(unparsed_binary, rest)
+      { Map.merge(sensor_updates, other_updates), unparsed_binary, expected_sensor_packets }
+    else
+      {%{}, binary, [next | rest]}
+    end
   end
 end

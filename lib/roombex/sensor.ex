@@ -4,9 +4,11 @@ defmodule Roombex.Sensor do
   @packet_sizes %{
     bumps_and_wheeldrops: 1,
     current: 2,
-    light_bumper_signal: 2,
     light_bumper: 1,
   }
+
+  def packet_size(packet) when packet in @light_sensors, do: 2
+  def packet_size(packet), do: Map.get(@packet_sizes, packet)
 
   def parse(:bumps_and_wheeldrops, binary) do
     << _rest::size(4),
