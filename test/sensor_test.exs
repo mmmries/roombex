@@ -28,4 +28,15 @@ defmodule Roombex.SensorTest do
     assert %{light_bumper_left: 1} = Sensor.parse(:light_bumper, <<1>>)
     assert %{light_bumper_right: 1, light_bumper_right_front: 1} = Sensor.parse(:light_bumper, <<48>>)
   end
+
+  test "it knows the size of sensor packets" do
+    assert Sensor.packet_size(:light_bumper) == 1
+    assert Sensor.packet_size(:light_sensor_left) == 2
+  end
+
+  test "packet_size throws an error for unknown packets" do
+    assert_raise KeyError, fn() ->
+      Sensor.packet_size(:wat)
+    end
+  end
 end
