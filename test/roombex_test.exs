@@ -65,11 +65,24 @@ defmodule RoombexTest do
     assert Roombex.play(4) == << 141, 4 >>
   end
 
-  test "sensors command" do
-    assert Roombex.sensors(:all) == << 142 , 0 >>
-    assert Roombex.sensors(:sensors) == << 142 , 1 >>
-    assert Roombex.sensors(:interface) == << 142 , 2 >>
-    assert Roombex.sensors(:electronics) == << 142 , 3 >>
+  test "sensors command with valid values" do
+    [0, 1, 2, 3, 4, 5, 6, 100, 101, 106, 107] |> Enum.each(fn(packet_group) ->
+      assert << 142, packet_group >> == Roombex.sensors(packet_group)
+    end)
+  end
+
+  test "sensors command with invalid values" do
+    [7, 16, 90, 110] |> Enum.each(fn(bad_value) ->
+      assert_raise(FunctionClauseError, fn() ->
+        Roombex.sensors(bad_value)
+      end)
+    end)
+  end
+
+  test "sensors command helpers" do
+    assert Roombex.sensors(:all) == << 142 , 100 >>
+    assert Roombex.sensors(:light_bumpers) == << 142 , 106 >>
+    assert Roombex.sensors(:motor_currents) == << 142 , 107 >>
   end
 
   test "force seeking dock" do
