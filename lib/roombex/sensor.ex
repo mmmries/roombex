@@ -1,6 +1,6 @@
 defmodule Roombex.Sensor do
   alias Roombex.State.Sensors
-  @light_sensors [:light_sensor_left, :light_sensor_right_front, :light_sensor_right_center, :light_sensor_right_center, :light_sensor_right_front, :light_sensor_right]
+  @light_sensors [:light_sensor_left, :light_sensor_left_front, :light_sensor_left_center, :light_sensor_right_center, :light_sensor_right_front, :light_sensor_right]
   @packet_sizes %{
     bumps_and_wheeldrops: 1,
     current: 2,
@@ -16,7 +16,7 @@ defmodule Roombex.Sensor do
        wheel_drop_right::unsigned-size(1),
        bumper_left::unsigned-size(1),
        bumper_right::unsigned-size(1), >> = binary
-    %Sensors{
+    %{
       wheel_drop_left: wheel_drop_left,
       wheel_drop_right: wheel_drop_right,
       bumper_left: bumper_left,
@@ -26,7 +26,7 @@ defmodule Roombex.Sensor do
 
   def parse(:current, binary) do
     << current::signed-size(16) >> = binary
-    %Sensors{current: current}
+    %{current: current}
   end
 
   def parse(:light_bumper, binary) do
@@ -38,7 +38,7 @@ defmodule Roombex.Sensor do
        left_front::unsigned-size(1),
        left::unsigned-size(1) >> = binary
 
-    %Sensors{
+    %{
       light_bumper_left: left,
       light_bumper_left_front: left_front,
       light_bumper_left_center: left_center,
@@ -50,6 +50,6 @@ defmodule Roombex.Sensor do
 
   def parse(packet, binary) when packet in @light_sensors do
     << strength::unsigned-size(16) >> = binary
-    Map.put(%Sensors{}, packet, strength / 4095.0)
+    Map.put(%{}, packet, strength / 4095.0)
   end
 end
