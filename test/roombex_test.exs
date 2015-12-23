@@ -72,7 +72,7 @@ defmodule RoombexTest do
   end
 
   test "sensors command with invalid values" do
-    [7, 16, 90, 110] |> Enum.each(fn(bad_value) ->
+    [-100, -1, 256, 500] |> Enum.each(fn(bad_value) ->
       assert_raise(FunctionClauseError, fn() ->
         Roombex.sensors(bad_value)
       end)

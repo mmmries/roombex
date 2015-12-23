@@ -24,7 +24,7 @@ defmodule Roombex do
   def sensors(:all), do: << 142, 100 >>
   def sensors(:light_bumpers), do: << 142, 106 >>
   def sensors(:motor_currents), do: << 142, 107 >>
-  def sensors(packet_group) when is_integer(packet_group), do: << 142, packet_group >>
+  def sensors(packet_group) when packet_group in 0..255, do: << 142, packet_group >>
   def safe, do: << 131 >>
   def song(number, notes) when number >= 0 and number <= 15 and length(notes) <= 16 do
     << 140, number, length(notes) >> <> notes_bytes(notes, << >>)
