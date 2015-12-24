@@ -19,7 +19,8 @@ defmodule Roombex.DJ do
     device = :serial.start([speed: speed, open: tty])
     # setup sensor listening
     listen_to = Keyword.get(opts, :listen_to, [:bumps_and_wheeldrops, :light_bumper])
-    :timer.send_interval(30, {:check_on, listen_to})
+    listen_interval = Keyword.get(opts, :listen_interval, 100)
+    :timer.send_interval(listen_interval, {:check_on, listen_to})
     # initializer connection
     send device, {:send, Roombex.start}
     :timer.sleep(50) # The SCI asks for a pause between commands that change the state
@@ -61,7 +62,6 @@ defmodule Roombex.DJ do
   end
 
   def handle_info({:data, data}, %{roomba: roomba}=state) do
-    Logger.debug "DJ ROOMBEX :: RECEIVED :: #{data}"
     old_sensors = roomba.sensors
     roomba = Roombex.State.update(roomba, data)
     if ! Map.equal?(old_sensors, roomba.sensors) do
@@ -69,13 +69,13 @@ defmodule Roombex.DJ do
     end
     {:noreply, %{state | roomba: roomba}}
   end
-  def handle_info({:listen_to, sensor_packets}, %{serial: device, roomba: roomba}=state) do
-    Enum.each(sensor_packets, &(send(device, {:send, Roombex.sensor(&1)})))
+  def handle_info({:check_on, sensor_packets}, %{serial: device, roomba: roomba}=state) do
+    Enum.each(sensor_packets, &(send(device, {:send, Roombex.sensors(&1)})))
     new_roomba = Map.put(roomba, :expected_sensor_packets, roomba.expected_sensor_packets ++ sensor_packets)
     {:noreply, %{state | roomba: new_roomba}}
   end
   def handle_info(msg, state) do
-    Logger.error "DJ ROOMBEX :: UNEXPECTED MESSAGE :: #{msg}"
+    Logger.error "DJ ROOMBEX :: UNEXPECTED MESSAGE :: #{inspect msg}"
     {:noreply, state}
   end
 end
