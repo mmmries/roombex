@@ -21,12 +21,14 @@ defmodule Roombex.DJ do
     listen_to = Keyword.get(opts, :listen_to, [:bumps_and_wheeldrops, :light_bumper])
     listen_interval = Keyword.get(opts, :listen_interval, 100)
     :timer.send_interval(listen_interval, {:check_on, listen_to})
-    # initializer connection
+    # who should receive status updates?
+    report_to = Keyword.get(opts, :report_to, nil)
+    # initialize connection
     send device, {:send, Roombex.start}
     :timer.sleep(50) # The SCI asks for a pause between commands that change the state
     send device, {:send, Roombex.safe}
     :timer.sleep(50)
-    {:ok, %{serial: device, roomba: %Roombex.State{}}}
+    {:ok, %{serial: device, roomba: %Roombex.State{}, report_to: report_to}}
   end
 
   def handle_cast({:command, binary}, %{serial: device}=state) do
@@ -65,7 +67,7 @@ defmodule Roombex.DJ do
     old_sensors = roomba.sensors
     roomba = Roombex.State.update(roomba, data)
     if ! Map.equal?(old_sensors, roomba.sensors) do
-      Logger.debug "#{inspect roomba.sensors}"
+      report_sensor_change(roomba, state)
     end
     {:noreply, %{state | roomba: roomba}}
   end
@@ -77,5 +79,11 @@ defmodule Roombex.DJ do
   def handle_info(msg, state) do
     Logger.error "DJ ROOMBEX :: UNEXPECTED MESSAGE :: #{inspect msg}"
     {:noreply, state}
+  end
+
+  # Private Functions
+  defp report_sensor_change(roomba, %{report_to: nil}), do: nil #no one to report to
+  defp report_sensor_change(roomba, %{report_to: report_to}) do
+    send report_to, {:roomba_status, roomba.sensors}
   end
 end
