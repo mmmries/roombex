@@ -68,6 +68,7 @@ defmodule Roombex.DJ do
     roomba = Roombex.State.update(roomba, data)
     if ! Map.equal?(old_sensors, roomba.sensors) do
       report_sensor_change(roomba, state)
+      take_evasive_action(roomba, state.serial)
     end
     {:noreply, %{state | roomba: roomba}}
   end
@@ -85,5 +86,15 @@ defmodule Roombex.DJ do
   defp report_sensor_change(roomba, %{report_to: nil}), do: nil #no one to report to
   defp report_sensor_change(roomba, %{report_to: report_to}) do
     send report_to, {:roomba_status, roomba.sensors}
+  end
+
+  defp take_evasive_action(sensors, serial_device) do
+    bump_sensors = [sensors.bumper_left, sensors.bumper_right]
+    case bump_sensors do
+      [1, 1] -> send device, {:send, Roombex.drive(-50, 0)}
+      [1, 0] -> send device, {:send, Roombex.drive(-50, 100)}
+      [0, 1] -> send device, {:send, Roombex.drive(-50, -100)}
+      [0, 0] -> send device, {:send, Roombex.drive(:stop)}
+    end
   end
 end
