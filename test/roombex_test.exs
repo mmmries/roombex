@@ -81,7 +81,7 @@ defmodule RoombexTest do
 
   test "sensors command helpers" do
     assert Roombex.sensors(:all) == << 142 , 100 >>
-    assert Roombex.sensors(:light_bumpers) == << 142 , 106 >>
+    assert Roombex.sensors(:light_sensors) == << 142 , 106 >>
     assert Roombex.sensors(:motor_currents) == << 142 , 107 >>
   end
 
