@@ -21,7 +21,7 @@ defmodule Roombex.Mixfile do
 
   defp deps do
     [
-      {:"erlang-serial", github: "knewter/erlang-serial"}
+      {:serial, "~> 0.1.1"}
     ]
   end
 
