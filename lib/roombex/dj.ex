@@ -1,15 +1,16 @@
 defmodule Roombex.DJ do
   require Logger
   use GenServer
+  alias Roombex.State
+  alias Roombex.State.Sensors
 
   # Client Interface
   def start_link(dj_opts, process_opts \\ []) do
     GenServer.start_link(__MODULE__, dj_opts, process_opts)
   end
 
-  def blink(pid \\ __MODULE__), do: GenServer.cast(pid, :blink)
   def command(pid \\ __MODULE__, binary), do: GenServer.cast(pid, {:command, binary})
-  def shimmy(pid \\ __MODULE__), do: GenServer.cast(pid, :shimmy)
+  def sensors(pid \\ __MODULE__), do: GenServer.call(pid, :sensors)
 
   # GenServer Callbacks
   def init(opts) do
@@ -31,35 +32,12 @@ defmodule Roombex.DJ do
     {:ok, %{serial: device, roomba: %Roombex.State{}, report_to: report_to}}
   end
 
+  def handle_call(:sensors, _from, %{roomba: %State{sensors: sensors}}=state) do
+    {:reply, sensors, state}
+  end
+
   def handle_cast({:command, binary}, %{serial: device}=state) do
     send device, {:send, binary}
-    {:noreply, state}
-  end
-
-  def handle_cast(:blink, %{serial: device}=state) do
-    Logger.debug "DJ Roombex :: I'm Blinking Here!"
-    which_leds = [:dirt_detect, :max, :clean, :spot, :status_red, :status_green]
-    send device, {:send, Roombex.leds(which_leds, 1.0, 1.0)}
-    :timer.sleep(1000)
-    send device, {:send, Roombex.leds([], 0.0, 0.0)}
-    {:noreply, state}
-  end
-
-  def handle_cast(:shimmy, %{serial: device}=state) do
-    Logger.debug "DJ Roombex :: Shimmy Time!"
-    send device, {:send, Roombex.drive(:turn_clockwise)}
-    :timer.sleep(100)
-    send device, {:send, Roombex.drive(:turn_counter_clockwise)}
-    :timer.sleep(100)
-    send device, {:send, Roombex.drive(:turn_clockwise)}
-    :timer.sleep(100)
-    send device, {:send, Roombex.drive(:turn_counter_clockwise)}
-    :timer.sleep(100)
-    send device, {:send, Roombex.drive(:turn_clockwise)}
-    :timer.sleep(100)
-    send device, {:send, Roombex.drive(:turn_counter_clockwise)}
-    :timer.sleep(100)
-    send device, {:send, Roombex.drive(:stop)}
     {:noreply, state}
   end
 
