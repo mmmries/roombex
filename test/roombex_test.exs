@@ -88,4 +88,8 @@ defmodule RoombexTest do
   test "force seeking dock" do
     assert Roombex.force_seeking_dock == << 143 >>
   end
+
+  test "reset command" do
+    assert Roombex.reset == << 7 >>
+  end
 end

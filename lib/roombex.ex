@@ -22,6 +22,7 @@ defmodule Roombex do
     << 141, number >>
   end
   def power, do: << 133 >>
+  def reset, do: << 7 >>
   def sensors(:all), do: << 142, 100 >>
   def sensors(:bumps_and_wheeldrops), do: << 142, 7 >>
   def sensors(:light_bumper), do: << 142, 45 >>
