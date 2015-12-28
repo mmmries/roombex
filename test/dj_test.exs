@@ -1,5 +1,5 @@
 defmodule Roombex.DJ.Test do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   alias Roombex.DJ
 
   @test_tty '/dev/ttyp0'
@@ -8,6 +8,7 @@ defmodule Roombex.DJ.Test do
     {:ok, dj} = DJ.start_link([report_to: self(), tty: @test_tty, listen_to: []])
     send dj, {:check_on, [:light_bumper]}
     send dj, {:elixir_serial, self(), <<12>>}
+    :timer.sleep(5)
     assert_receive {:roomba_status, %{light_bumper_left_center: 1, light_bumper_right_center: 1}}
   end
 

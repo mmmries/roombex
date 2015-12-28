@@ -4,6 +4,8 @@ defmodule Roombex.DJ do
   alias Roombex.State
   alias Roombex.State.Sensors
 
+  @baud_rate 115_200
+
   # Client Interface
   def start_link(dj_opts, process_opts \\ []) do
     GenServer.start_link(__MODULE__, dj_opts, process_opts)
@@ -15,10 +17,9 @@ defmodule Roombex.DJ do
   # GenServer Callbacks
   def init(opts) do
     # setup connection
-    speed = Keyword.get(opts, :speed, 115_200)
     tty = Keyword.get(opts, :tty, '/dev/ttyAMA0')
     {:ok, serial} = Serial.start_link()
-    Serial.set_speed(serial, speed)
+    Serial.set_speed(serial, @baud_rate)
     Serial.open(serial, tty)
     Serial.connect(serial)
     # setup sensor listening
@@ -27,11 +28,7 @@ defmodule Roombex.DJ do
     :timer.send_interval(listen_interval, {:check_on, listen_to})
     # who should receive status updates?
     report_to = Keyword.get(opts, :report_to, nil)
-    # initialize connection
-    Serial.send_data(serial, Roombex.start)
-    :timer.sleep(50) # The SCI asks for a pause between commands that change the state
-    Serial.send_data(serial, Roombex.safe)
-    :timer.sleep(50)
+    send self(), :safe_mode
     {:ok, %{serial: serial, roomba: %Roombex.State{}, report_to: report_to}}
   end
 
@@ -41,6 +38,15 @@ defmodule Roombex.DJ do
 
   def handle_cast({:command, binary}, %{serial: device}=state) do
     Serial.send_data(device, binary)
+    {:noreply, state}
+  end
+  def handle_cast(:reset, %{serial: serial}=state) do
+    Serial.set_speed(serial, 19_200) # sometimes the roomba gets set back to the wrong baud rate so we try a reset at the lower baud rate as well
+    Serial.send_data(serial, Roombex.reset)
+    Serial.set_speed(serial, @baud_rate)
+    Serial.send_data(serial, Roombex.reset)
+    send self(), :safe_mode
+    :timer.sleep(10_000)
     {:noreply, state}
   end
 
@@ -56,6 +62,13 @@ defmodule Roombex.DJ do
     Enum.each(sensor_packets, &(Serial.send_data(device, Roombex.sensors(&1))))
     new_roomba = Map.put(roomba, :expected_sensor_packets, roomba.expected_sensor_packets ++ sensor_packets)
     {:noreply, %{state | roomba: new_roomba}}
+  end
+  def handle_info(:safe_mode, %{serial: serial}=state) do
+    Serial.send_data(serial, Roombex.start)
+    :timer.sleep(50)
+    Serial.send_data(serial, Roombex.safe)
+    :timer.sleep(50)
+    {:noreply, state}
   end
   def handle_info(msg, state) do
     Logger.error "DJ ROOMBEX :: UNEXPECTED MESSAGE :: #{inspect msg}"
