@@ -17,7 +17,10 @@ defmodule Roombex.DJ do
     # setup connection
     speed = Keyword.get(opts, :speed, 115_200)
     tty = Keyword.get(opts, :tty, '/dev/ttyAMA0')
-    device = :serial.start([speed: speed, open: tty])
+    {:ok, serial} = Serial.start_link()
+    Serial.set_speed(serial, speed)
+    Serial.open(serial, tty)
+    Serial.connect(serial)
     # setup sensor listening
     listen_to = Keyword.get(opts, :listen_to, [:bumps_and_wheeldrops, :light_bumper])
     listen_interval = Keyword.get(opts, :listen_interval, 100)
@@ -25,11 +28,11 @@ defmodule Roombex.DJ do
     # who should receive status updates?
     report_to = Keyword.get(opts, :report_to, nil)
     # initialize connection
-    send device, {:send, Roombex.start}
+    Serial.send_data(serial, Roombex.start)
     :timer.sleep(50) # The SCI asks for a pause between commands that change the state
-    send device, {:send, Roombex.safe}
+    Serial.send_data(serial, Roombex.safe)
     :timer.sleep(50)
-    {:ok, %{serial: device, roomba: %Roombex.State{}, report_to: report_to}}
+    {:ok, %{serial: serial, roomba: %Roombex.State{}, report_to: report_to}}
   end
 
   def handle_call(:sensors, _from, %{roomba: %State{sensors: sensors}}=state) do
@@ -37,11 +40,11 @@ defmodule Roombex.DJ do
   end
 
   def handle_cast({:command, binary}, %{serial: device}=state) do
-    send device, {:send, binary}
+    Serial.send_data(device, binary)
     {:noreply, state}
   end
 
-  def handle_info({:data, data}, %{roomba: roomba}=state) do
+  def handle_info({:elixir_serial, _pid, data}, %{roomba: roomba}=state) do
     old_sensors = roomba.sensors
     roomba = Roombex.State.update(roomba, data)
     if ! Map.equal?(old_sensors, roomba.sensors) do
@@ -50,7 +53,7 @@ defmodule Roombex.DJ do
     {:noreply, %{state | roomba: roomba}}
   end
   def handle_info({:check_on, sensor_packets}, %{serial: device, roomba: roomba}=state) do
-    Enum.each(sensor_packets, &(send(device, {:send, Roombex.sensors(&1)})))
+    Enum.each(sensor_packets, &(Serial.send_data(device, Roombex.sensors(&1))))
     new_roomba = Map.put(roomba, :expected_sensor_packets, roomba.expected_sensor_packets ++ sensor_packets)
     {:noreply, %{state | roomba: new_roomba}}
   end
