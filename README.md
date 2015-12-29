@@ -1,8 +1,8 @@
 Roombex
 =======
 
-A functional library that translates from Elixir literals to [Roomba Serial Command Interface](http://www.ecsl.cs.sunysb.edu/mint/Roomba_SCI_Spec_Manual.pdf).
+A functional library that translates from Elixir literals to the [Create 2 Open Interface](https://www.adafruit.com/datasheets/create_2_Open_Interface_Spec.pdf).
 
-Initially I am targeting the original SCI specification because I happen to have a 400-series roomba hanging around.
+I'm using this with some [iRobot Create 2's](http://www.irobot.com/About-iRobot/STEM/Create-2.aspx) but it should work with any roomba after the 600 series.
 
-I would be thrilled to add support for more recent SCI specifications (ie the [Create Open Interface v2](http://www.irobot.com/filelibrary/pdfs/hrd/create/Create%20Open%20Interface_v2.pdf)) if other people have actual machines to test out the extra commands.
+I've started by supporting only a few of the basic commands and sensors, but there are a lot of open issues for supporting the rest of the interface. It would also be great to get feedback on whether the Genserver (`Roombex.DJ`) is useful to other people and/or how it might be made more useful.
