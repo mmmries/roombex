@@ -20,6 +20,7 @@ defmodule Roombex.DJ do
     {:ok, serial} = Serial.start_link()
     Serial.set_speed(serial, speed)
     Serial.open(serial, tty)
+    Serial.connect(serial)
     # setup sensor listening
     listen_to = Keyword.get(opts, :listen_to, [:bumps_and_wheeldrops, :light_bumper])
     listen_interval = Keyword.get(opts, :listen_interval, 100)
