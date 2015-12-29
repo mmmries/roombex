@@ -2,7 +2,6 @@ defmodule Roombex.DJ do
   require Logger
   use GenServer
   alias Roombex.State
-  alias Roombex.State.Sensors
 
   @baud_rate 115_200
 
@@ -30,7 +29,7 @@ defmodule Roombex.DJ do
     # who should receive status updates?
     report_to = Keyword.get(opts, :report_to, nil)
     send self(), :safe_mode
-    {:ok, %{serial: serial, roomba: %Roombex.State{}, report_to: report_to}}
+    {:ok, %{serial: serial, roomba: %State{}, report_to: report_to}}
   end
 
   def handle_call(:sensors, _from, %{roomba: %State{sensors: sensors}}=state) do
@@ -78,7 +77,7 @@ defmodule Roombex.DJ do
   end
 
   # Private Functions
-  defp report_sensor_change(roomba, %{report_to: nil}), do: nil #no one to report to
+  defp report_sensor_change(_roomba, %{report_to: nil}), do: nil #no one to report to
   defp report_sensor_change(roomba, %{report_to: report_to}) do
     send report_to, {:roomba_status, roomba.sensors}
   end
