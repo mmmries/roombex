@@ -12,6 +12,7 @@ defmodule Roombex.DJ do
   end
 
   def command(pid \\ __MODULE__, binary), do: GenServer.cast(pid, {:command, binary})
+  def reset(pid \\ __MODULE__), do: GenServer.cast(pid, :reset)
   def sensors(pid \\ __MODULE__), do: GenServer.call(pid, :sensors)
 
   # GenServer Callbacks
