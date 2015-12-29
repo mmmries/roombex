@@ -61,7 +61,8 @@ defmodule Roombex.DJ do
   end
   def handle_info({:check_on, sensor_packets}, %{serial: device, roomba: roomba}=state) do
     Enum.each(sensor_packets, &(Serial.send_data(device, Roombex.sensors(&1))))
-    new_roomba = Map.put(roomba, :expected_sensor_packets, roomba.expected_sensor_packets ++ sensor_packets)
+    # note: rather than handling the case of a faulty UART connection to the roomba, we just ignore old requests that weren't fulfilled
+    new_roomba = Map.put(roomba, :expected_sensor_packets, sensor_packets)
     {:noreply, %{state | roomba: new_roomba}}
   end
   def handle_info(:safe_mode, %{serial: serial}=state) do
