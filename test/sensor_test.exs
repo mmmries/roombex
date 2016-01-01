@@ -42,7 +42,10 @@ defmodule Roombex.SensorTest do
   end
 
   test "parsing open_interface_mode" do
-    assert %{open_interface_mode: :WAT} = Sensor.parse(:open_interface_mode, <<1>>)
+    assert %{open_interface_mode: :off} = Sensor.parse(:open_interface_mode, <<0>>)
+    assert %{open_interface_mode: :passive} = Sensor.parse(:open_interface_mode, <<1>>)
+    assert %{open_interface_mode: :safe} = Sensor.parse(:open_interface_mode, <<2>>)
+    assert %{open_interface_mode: :full} = Sensor.parse(:open_interface_mode, <<3>>)
   end
 
   test "parsing light bumper" do

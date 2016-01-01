@@ -132,6 +132,17 @@ defmodule Roombex.Sensor do
     }
   end
 
+  def parse(:open_interface_mode, binary) do
+    << number::unsigned-size(8) >> = binary
+    atom = case number do
+      0 -> :off
+      1 -> :passive
+      2 -> :safe
+      3 -> :full
+    end
+    %{open_interface_mode: atom}
+  end
+
   def parse(packet, binary) do
     type = Map.fetch!(@packets, packet)[:type]
     parse_by_type(packet, binary, type)
