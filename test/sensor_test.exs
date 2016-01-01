@@ -25,6 +25,26 @@ defmodule Roombex.SensorTest do
     assert %{bumper_left: 1} = Sensor.parse(:bumps_and_wheeldrops, <<2>>)
   end
 
+  test "parsing overcurrents" do
+    assert %{overcurrent_left_wheel: 1} = Sensor.parse(:overcurrents, <<0>>)
+  end
+
+  test "parsing buttons" do
+    assert %{button_spot: 1, button_hour: 1} = Sensor.parse(:buttons, << 0b00010010 >>)
+  end
+
+  test "parsing charging_state" do
+    assert %{charging_state: :trickle_charging} = Sensor.parse(:charging_state, <<3>>)
+  end
+
+  test "parsing charger_available" do
+    assert %{charger_available: :WAT} = Sensor.parse(:charger_available, <<3>>)
+  end
+
+  test "parsing open_interface_mode" do
+    assert %{open_interface_mode: :WAT} = Sensor.parse(:open_interface_mode, <<1>>)
+  end
+
   test "parsing light bumper" do
     assert %{light_bumper_left: 0,
              light_bumper_left_front: 0,
