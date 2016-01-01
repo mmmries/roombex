@@ -1,19 +1,19 @@
 defmodule Roombex.Sensor do
   @packets %{
-    bumps_and_wheeldrops: %{id: 7, bytes: 1},
+    bumps_and_wheeldrops: %{id: 7, bytes: 1, type: :custom},
     wall: %{id: 8, bytes: 1, type: :one_byte_unsigned},
     cliff_left: %{id: 9, bytes: 1, type: :one_byte_unsigned},
     cliff_left_front: %{id: 10, bytes: 1, type: :one_byte_unsigned},
     cliff_right_front: %{id: 11, bytes: 1, type: :one_byte_unsigned},
     cliff_right: %{id: 12, bytes: 1, type: :one_byte_unsigned},
     virtual_wall: %{id: 13, bytes: 1, type: :one_byte_unsigned},
-    overcurrents: %{id: 14, bytes: 1},
+    overcurrents: %{id: 14, bytes: 1, type: :custom},
     dirt_detect: %{id: 15, bytes: 1, type: :one_byte_unsigned},
     ir_opcode: %{id: 17, bytes: 1, type: :one_byte_unsiged},
-    buttons: %{id: 18, bytes: 1},
+    buttons: %{id: 18, bytes: 1, type: :custom},
     distance: %{id: 19, bytes: 2, type: :two_byte_signed},
     angle: %{id: 20, bytes: 2, type: :two_byte_signed},
-    charging_state: %{id: 21, bytes: 1},
+    charging_state: %{id: 21, bytes: 1, type: :custom},
     voltage: %{id: 22, bytes: 2, type: :two_byte_unsigned},
     current: %{id: 23, bytes: 2, type: :two_byte_signed},
     temperature: %{id: 24, bytes: 2, type: :one_byte_signed},
@@ -24,8 +24,8 @@ defmodule Roombex.Sensor do
     cliff_left_front_signal: %{id: 29, bytes: 2, type: :twelve_bit_unsigned},
     cliff_right_front_signal: %{id: 30, bytes: 2, type: :twelve_bit_unsigned},
     cliff_right_signal: %{id: 31, bytes: 2, type: :twelve_bit_unsigned},
-    charger_available: %{id: 34, bytes: 1}, #type?
-    open_interface_mode: %{id: 35, bytes: 1}, #type?
+    charger_available: %{id: 34, bytes: 1, type: :custom},
+    open_interface_mode: %{id: 35, bytes: 1, type: :custom},
     song_number: %{id: 37, bytes: 1, type: :one_byte_unsigned},
     song_playing?: %{id: 38, bytes: 1, type: :one_byte_unsigned},
     velocity: %{id: 39, bytes: 2, type: :two_byte_unsigned}, #mm/sec
@@ -34,7 +34,7 @@ defmodule Roombex.Sensor do
     velocity_left: %{id: 42, bytes: 2, type: :two_byte_signed}, #mm/sec
     encoder_counts_left: %{id: 43, bytes: 2, type: :two_byte_unsigned},
     encoder_counts_right: %{id: 44, bytes: 2, type: :two_byte_unsigned},
-    light_bumper: %{id: 45, bytes: 1},
+    light_bumper: %{id: 45, bytes: 1, type: :custom},
     light_bumper_left_signal: %{id: 46, bytes: 2, type: :twelve_bit_unsigned},
     light_bumper_left_front_signal: %{id: 47, bytes: 2, type: :twelve_bit_unsigned},
     light_bumper_left_center_signal: %{id: 48, bytes: 2, type: :twelve_bit_unsigned},
@@ -76,6 +76,27 @@ defmodule Roombex.Sensor do
       wheel_drop_right: wheel_drop_right,
       bumper_left: bumper_left,
       bumper_right: bumper_right,
+    }
+  end
+
+  def parse(:buttons, binary) do
+    << clock::size(1),
+       schedule::size(1),
+       day::size(1),
+       hour::size(1),
+       minute::size(1),
+       dock::size(1),
+       spot::size(1),
+       clean::size(1) >> = binary
+    %{
+      button_clock: clock,
+      button_schedule: schedule,
+      button_day: day,
+      button_hour: hour,
+      button_minute: minute,
+      button_dock: dock,
+      button_spot: spot,
+      button_clean: clean,
     }
   end
 
