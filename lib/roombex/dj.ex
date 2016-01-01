@@ -47,7 +47,6 @@ defmodule Roombex.DJ do
   end
 
   def handle_info({:elixir_serial, _pid, data}, %{roomba: roomba}=state) do
-    Logger.debug "DJ received :: #{inspect data}"
     old_sensors = roomba.sensors
     roomba = Roombex.State.update(roomba, data)
     if ! Map.equal?(old_sensors, roomba.sensors) do
