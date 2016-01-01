@@ -26,7 +26,7 @@ defmodule Roombex.SensorTest do
   end
 
   test "parsing overcurrents" do
-    assert %{overcurrent_left_wheel: 1} = Sensor.parse(:overcurrents, <<0>>)
+    assert %{overcurrent_left_wheel: 1, overcurrent_side_brush: 1} = Sensor.parse(:overcurrents, << 0b00010001 >>)
   end
 
   test "parsing buttons" do

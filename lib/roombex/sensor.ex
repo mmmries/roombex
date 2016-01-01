@@ -153,6 +153,21 @@ defmodule Roombex.Sensor do
     %{open_interface_mode: atom}
   end
 
+  def parse(:overcurrents, binary) do
+    << _prefix::size(3),
+       left_wheel::size(1),
+       right_wheel::size(1),
+       main_brush::size(1),
+       _unused::size(1),
+       side_brush::size(1) >> = binary
+    %{
+      overcurrent_left_wheel: left_wheel,
+      overcurrent_right_wheel: right_wheel,
+      overcurrent_main_brush: main_brush,
+      overcurrent_side_brush: side_brush,
+    }
+  end
+
   def parse(packet, binary) do
     type = Map.fetch!(@packets, packet)[:type]
     parse_by_type(packet, binary, type)
