@@ -100,6 +100,19 @@ defmodule Roombex.Sensor do
     }
   end
 
+  def parse(:charging_state, binary) do
+    << number::unsigned-size(8) >> = binary
+    atom = case number do
+      0 -> :not_charging
+      1 -> :recondition_charging
+      2 -> :full_charging
+      3 -> :trickle_charging
+      4 -> :waiting
+      5 -> :charging_fault_condition
+    end
+    %{charging_state: atom}
+  end
+
   def parse(:light_bumper, binary) do
     << _rest::size(2),
        right::unsigned-size(1),
