@@ -38,7 +38,7 @@ defmodule Roombex.SensorTest do
   end
 
   test "parsing charger_available" do
-    assert %{charger_available: :WAT} = Sensor.parse(:charger_available, <<3>>)
+    assert %{charger_available_dock: 1, charger_available_internal: 0} = Sensor.parse(:charger_available, << 0b00000010 >>)
   end
 
   test "parsing open_interface_mode" do

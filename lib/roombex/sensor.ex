@@ -100,6 +100,16 @@ defmodule Roombex.Sensor do
     }
   end
 
+  def parse(:charger_available, binary) do
+    << _rest::size(6),
+       dock::size(1),
+       internal::size(1) >> = binary
+    %{
+      charger_available_dock: dock,
+      charger_available_internal: internal,
+    }
+  end
+
   def parse(:charging_state, binary) do
     << number::unsigned-size(8) >> = binary
     atom = case number do
