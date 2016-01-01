@@ -12,12 +12,12 @@ defmodule Roombex.State.Sensors do
             light_bumper_right_front: 0,
             light_bumper_right: 0,
             # signal strength for the light sensors in the bumper (normalized to 0.0-1.0)
-            light_sensor_left: 0,
-            light_sensor_left_front: 0,
-            light_sensor_left_center: 0,
-            light_sensor_right_center: 0,
-            light_sensor_right_front: 0,
-            light_sensor_right: 0,
+            light_bumper_left_signal: 0,
+            light_bumper_left_front_signal: 0,
+            light_bumper_left_center_signal: 0,
+            light_bumper_right_center_signal: 0,
+            light_bumper_right_front_signal: 0,
+            light_bumper_right_signal: 0,
             # wheel drop sensors (0/1)
             wheel_drop_left: 0,
             wheel_drop_right: 0
