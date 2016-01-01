@@ -1,5 +1,6 @@
 defmodule Roombex do
   use Bitwise
+  alias Roombex.Sensor
 
   def baud(rate), do: << 129, baud_code(rate) >>
   def clean, do: << 135 >>
@@ -23,12 +24,11 @@ defmodule Roombex do
   end
   def power, do: << 133 >>
   def reset, do: << 7 >>
-  def sensors(:all), do: << 142, 100 >>
-  def sensors(:bumps_and_wheeldrops), do: << 142, 7 >>
-  def sensors(:light_bumper), do: << 142, 45 >>
-  def sensors(:light_sensors), do: << 142, 106 >>
-  def sensors(:motor_currents), do: << 142, 107 >>
   def sensors(packet_group) when packet_group in 0..255, do: << 142, packet_group >>
+  def sensors(packet) when is_atom(packet) do
+    packet_id = Sensor.packet_id(packet)
+    << 142, packet_id >>
+  end
   def safe, do: << 131 >>
   def song(number, notes) when number >= 0 and number <= 15 and length(notes) <= 16 do
     << 140, number, length(notes) >> <> notes_bytes(notes, << >>)

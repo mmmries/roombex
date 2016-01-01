@@ -50,7 +50,20 @@ defmodule Roombex.Sensor do
     stasis: %{id: 58, bytes: 1, type: :one_byte_unsigned},
   }
 
+  @packet_groups %{
+    all: %{id: 100},
+    battery: %{id: 3},
+    light_bumper_signals: %{id: 106},
+  }
+
   def packet_size(packet) when is_atom(packet), do: Map.fetch!(@packets, packet)[:bytes]
+
+  def packet_id(packet) when is_atom(packet) do
+    case Map.get(@packets, packet) do
+      %{id: id} -> id
+      nil -> Map.fetch!(@packet_groups, packet)[:id]
+    end
+  end
 
   def parse(:bumps_and_wheeldrops, binary) do
     << _rest::size(4),
