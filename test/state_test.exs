@@ -30,4 +30,24 @@ defmodule Roombex.StateText do
     assert %State{expected_sensor_packets: [], unparsed_binary: <<>>} = state
     assert state.sensors.light_bumper_left_signal == 88 / 4095.0
   end
+
+  test "it keeps track of its cartesian coordinates" do
+    state = %State{}
+    assert state.coordinates == {0,0}
+    assert state.heading == 0
+    state = State.update(%State{state | expected_sensor_packets: [:distance, :angle]}, << 0, 100, 0>>)
+    assert state.coordinates == {0, 0}
+    state = State.update(state, << 0 >>)
+    assert state.coordinates == {100, 0}
+    assert state.heading == 0
+    state = State.update(%State{state | expected_sensor_packets: [:distance, :angle]}, << 0, 100, 0, 45 >>)
+    assert state.coordinates == {171, 71}
+    assert state.heading == 45
+    state = State.update(%State{state | expected_sensor_packets: [:distance, :angle]}, << 0, 100, 0, 0 >>)
+    assert state.coordinates == {242, 142}
+    assert state.heading == 45
+    state = State.update(%State{state | expected_sensor_packets: [:distance, :angle]}, << 255, 156, 255, 241 >>)
+    assert state.coordinates == {155, 92}
+    assert state.heading == 30
+  end
 end
