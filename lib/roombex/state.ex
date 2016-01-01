@@ -1,9 +1,53 @@
 defmodule Roombex.State.Sensors do
+            # Angle moved through since last check (-32768 - 32767 degrees)
+  defstruct angle: 0,
             # Physical bump sensors (0/1)
-  defstruct bumper_left: 0,
+            bumper_left: 0,
             bumper_right: 0,
-            # Current being expended or charged by the roomba (-32768 - 32767 mA)
+            # Battery State (0 - 65535 mAh)
+            battery_charge: 0,
+            battery_capacity: 0,
+            # Buttons (0/1)
+            button_clean: 0,
+            button_clock: 0,
+            button_day: 0,
+            button_dock: 0,
+            button_hour: 0,
+            button_minute: 0,
+            button_schedule: 0,
+            button_spot: 0,
+            # Chargers Available (0/1)
+            charger_available_dock: 0,
+            charger_available_internal: 0,
+            # Charging State (atom)
+            charging_state: :not_charging,
+            # Cliff sensors (0/1)
+            cliff_left: 0,
+            cliff_left_front: 0,
+            cliff_right_front: 0,
+            cliff_right: 0,
+            # Cliff signals (0.0 - 1.0)
+            cliff_left_signal: 0.0,
+            cliff_left_front_signal: 0.0,
+            cliff_right_front_signal: 0.0,
+            cliff_right_signal: 0.0,
+            # Current being expended or charged (-32768 - 32767 mA)
             current: 0,
+            current_left_motor: 0,
+            current_main_brush: 0,
+            current_right_motor: 0,
+            current_side_brush: 0,
+            # Dirt detect sensors (0-255)
+            dirt_detect: 0,
+            # Distance, millimeters moved since last check (-32768 - 32767 mm)
+            distance: 0,
+            # Encoders: number of encoder clicks, rolls over (0 - 65535)
+            encoder_counts_left: 0,
+            encoder_counts_right: 0,
+            # IR Opcodes (0-255)
+            ir_opcode: 0,
+            ir_opcode_left: 0,
+            ir_opcode_right: 0,
             # Simple 0/1 bump sensors for the light bumpers
             light_bumper_left: 0,
             light_bumper_left_front: 0,
@@ -18,6 +62,32 @@ defmodule Roombex.State.Sensors do
             light_bumper_right_center_signal: 0,
             light_bumper_right_front_signal: 0,
             light_bumper_right_signal: 0,
+            # Open Interface Mode (atom :off, :passive, :safe, :full)
+            open_interface_mode: :off,
+            # Overcurrents (0/1)
+            overcurrent_left_wheel: 0,
+            overcurrent_right_wheel: 0,
+            overcurrent_main_brush: 0,
+            overcurrent_side_brush: 0,
+            # Song Number (0 - 15)
+            song_number: 0,
+            # Song Playing? (0 / 1)
+            song_playing?: 0,
+            # Stasis - making forward progress? (0 / 1)
+            stasis: 0,
+            # Temperature (-128 - 127 degrees Celsius)
+            temperature: 0,
+            # Wheel Velocities (-500 - 500 mm/sec)
+            velocity_left: 0,
+            velocity_right: 0,
+            # Virtual wall (0/1)
+            virtual_wall: 0,
+            # Voltage (0 - 65535 mV)
+            voltage: 0,
+            # Wall sensor (0/1)
+            wall: 0,
+            # Wall Signal (0.0-1.0)
+            wall_signal: 0.0,
             # wheel drop sensors (0/1)
             wheel_drop_left: 0,
             wheel_drop_right: 0

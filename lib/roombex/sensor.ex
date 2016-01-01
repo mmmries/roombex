@@ -43,10 +43,10 @@ defmodule Roombex.Sensor do
     light_bumper_right_signal: %{id: 51, bytes: 2, type: :twelve_bit_unsigned},
     ir_opcode_left: %{id: 52, bytes: 1, type: :one_byte_unsigned},
     ir_opcode_right: %{id: 53, bytes: 1, type: :one_byte_unsigned},
-    left_motor_current: %{id: 54, bytes: 2, type: :two_byte_signed_packets},
-    right_motor_current: %{id: 55, bytes: 2, type: :two_byte_signed_packets},
-    main_brush_current: %{id: 56, bytes: 2, type: :two_byte_signed_packets},
-    side_brush_current: %{id: 57, bytes: 2, type: :two_byte_signed_packets},
+    current_left_motor: %{id: 54, bytes: 2, type: :two_byte_signed_packets},
+    current_right_motor: %{id: 55, bytes: 2, type: :two_byte_signed_packets},
+    current_main_brush: %{id: 56, bytes: 2, type: :two_byte_signed_packets},
+    current_side_brush: %{id: 57, bytes: 2, type: :two_byte_signed_packets},
     stasis: %{id: 58, bytes: 1, type: :one_byte_unsigned},
   }
 
