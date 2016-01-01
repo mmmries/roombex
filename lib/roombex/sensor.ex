@@ -1,13 +1,26 @@
 defmodule Roombex.Sensor do
-  alias Roombex.State.Sensors
-  @light_sensors [:light_sensor_left, :light_sensor_left_front, :light_sensor_left_center, :light_sensor_right_center, :light_sensor_right_front, :light_sensor_right]
   @packet_sizes %{
     bumps_and_wheeldrops: 1,
-    current: 2,
     light_bumper: 1,
   }
+  @one_by_unsigned_packets [ :virtual_wall ]
+  @two_byte_signed_packets [ :current ]
+  @twelve_bit_unsigned_packets [
+    :cliff_left_signal,
+    :cliff_left_front_signal,
+    :cliff_right_front_signal,
+    :cliff_right_signal,
+    :light_sensor_left,
+    :light_sensor_left_front,
+    :light_sensor_left_center,
+    :light_sensor_right_center,
+    :light_sensor_right_front,
+    :light_sensor_right,
+  ]
 
-  def packet_size(packet) when packet in @light_sensors, do: 2
+  def packet_size(packet) when packet in @one_by_unsigned_packets, do: 1
+  def packet_size(packet) when packet in @two_byte_signed_packets, do: 2
+  def packet_size(packet) when packet in @twelve_bit_unsigned_packets, do: 2
   def packet_size(packet), do: Map.fetch!(@packet_sizes, packet)
 
   def parse(:bumps_and_wheeldrops, binary) do
@@ -24,9 +37,19 @@ defmodule Roombex.Sensor do
     }
   end
 
-  def parse(:current, binary) do
-    << current::signed-size(16) >> = binary
-    %{current: current}
+  def parse(packet, binary) when packet in @one_by_unsigned_packets do
+    << number::unsigned-size(8) >> = binary
+    Map.put(%{}, packet, number)
+  end
+
+  def parse(packet, binary) when packet in @two_byte_signed_packets do
+    << number::signed-size(16) >> = binary
+    Map.put(%{}, packet, number)
+  end
+
+  def parse(packet, binary) when packet in @twelve_bit_unsigned_packets do
+    << number::unsigned-size(16) >> = binary
+    Map.put(%{}, packet, number / 4095.0)
   end
 
   def parse(:light_bumper, binary) do
@@ -46,10 +69,5 @@ defmodule Roombex.Sensor do
       light_bumper_right_front: right_front,
       light_bumper_right: right,
     }
-  end
-
-  def parse(packet, binary) when packet in @light_sensors do
-    << strength::unsigned-size(16) >> = binary
-    Map.put(%{}, packet, strength / 4095.0)
   end
 end
