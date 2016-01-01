@@ -17,15 +17,11 @@ defmodule Roombex.DJ do
   # GenServer Callbacks
   def init(opts) do
     # setup connection
-    tty = Keyword.get(opts, :tty, '/dev/ttyAMA0')
+    tty = Keyword.fetch!(opts, :tty)
     {:ok, serial} = Serial.start_link()
     Serial.set_speed(serial, @baud_rate)
     Serial.open(serial, tty)
     Serial.connect(serial)
-    # setup sensor listening
-    listen_to = Keyword.get(opts, :listen_to, [:bumps_and_wheeldrops, :light_bumper])
-    listen_interval = Keyword.get(opts, :listen_interval, 100)
-    :timer.send_interval(listen_interval, {:check_on, listen_to})
     # who should receive status updates?
     report_to = Keyword.get(opts, :report_to, nil)
     send self(), :safe_mode
