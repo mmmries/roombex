@@ -96,11 +96,7 @@ end
 defmodule Roombex.State do
   # coordinates is an inferred value
   # by watching the distance and angle sensors we try to infer our current cartesian coordinates
-  defstruct coordinates: {0, 0},
-            delta_sensors: %{},
-            expected_sensor_packets: [],
-            heading: 0,
-            mode: :PASSIVE,
+  defstruct expected_sensor_packets: [],
             sensors: %Roombex.State.Sensors{},
             unparsed_binary: <<>>
   import Roombex.Sensor, only: [parse: 2, packet_size: 1]
@@ -108,10 +104,8 @@ defmodule Roombex.State do
   def update(%Roombex.State{sensors: sensors}=state, binary) do
     binary = state.unparsed_binary <> binary
     {parsed_sensor_values, unparsed_binary, unparsed_packets} = parse_expected_updates(binary, state.expected_sensor_packets)
-    delta_sensors = Map.merge(state.delta_sensors, parsed_sensor_values)
-    {new_coordinates, new_heading, delta_sensors} = infer_coordinates_and_heading(state, delta_sensors)
     sensors = Map.merge(sensors, parsed_sensor_values)
-    %{state | coordinates: new_coordinates, delta_sensors: delta_sensors, heading: new_heading, sensors: sensors, expected_sensor_packets: unparsed_packets, unparsed_binary: unparsed_binary}
+    %{state | sensors: sensors, expected_sensor_packets: unparsed_packets, unparsed_binary: unparsed_binary}
   end
 
   defp parse_expected_updates(<<>>, expected_sensor_packets), do: {%{}, <<>>, expected_sensor_packets}
@@ -126,16 +120,5 @@ defmodule Roombex.State do
     else
       {%{}, binary, [next | rest]}
     end
-  end
-
-  def infer_coordinates_and_heading(%{heading: heading, coordinates: {x, y}}, %{angle: angle, distance: distance}=delta_sensors) do
-    heading = heading + angle
-    radians = heading * (:math.pi / 180.0)
-    dx = (distance * :math.cos(radians)) |> Float.round |> trunc
-    dy = (distance * :math.sin(radians)) |> Float.round |> trunc
-    {{x + dx, y + dy}, heading, Map.drop(delta_sensors, [:angle, :distance])}
-  end
-  def infer_coordinates_and_heading(%{heading: heading, coordinates: coords}, delta_sensors) do
-    {coords, heading, delta_sensors}
   end
 end
