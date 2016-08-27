@@ -21,7 +21,8 @@ defmodule Roombex.Mixfile do
 
   defp deps do
     [
-      {:serial, "~> 0.1.2"}
+      {:serial, "~> 0.1.2"},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 

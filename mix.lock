@@ -1,2 +1,4 @@
-%{"erlang-serial": {:git, "https://github.com/knewter/erlang-serial.git", "61821783259551090af7a8561891a345c0547af2", []},
-  "serial": {:hex, :serial, "0.1.2"}}
+%{"earmark": {:hex, :earmark, "1.0.1", "2c2cd903bfdc3de3f189bd9a8d4569a075b88a8981ded9a0d95672f6e2b63141", [:mix], []},
+  "erlang-serial": {:git, "https://github.com/knewter/erlang-serial.git", "61821783259551090af7a8561891a345c0547af2", []},
+  "ex_doc": {:hex, :ex_doc, "0.13.0", "aa2f8fe4c6136a2f7cfc0a7e06805f82530e91df00e2bff4b4362002b43ada65", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
+  "serial": {:hex, :serial, "0.1.2", "8c0959331417372bf58f259dbc106c59bb7ed482cb3f63f3765150c02cf14b88", [:mix, :make], []}}
