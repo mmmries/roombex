@@ -3,6 +3,14 @@ defmodule Roombex.DeadReckonerTest do
   import Roombex.DeadReckoner
   alias Roombex.WhereAmI
 
+  test "initial idling" do
+    whereami = WhereAmI.init
+      |> update(%{encoder_counts_left: 0, encoder_counts_right: 0})
+    assert_in_delta whereami.heading, 0.0, 0.01
+    assert_in_delta whereami.x,       0.0, 0.1
+    assert_in_delta whereami.y,       0.0, 0.1
+  end
+
   test "moving forward" do
     whereami = WhereAmI.init
       |> update(%{encoder_counts_left: 509, encoder_counts_right: 509})
