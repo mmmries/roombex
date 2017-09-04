@@ -4,12 +4,12 @@ defmodule Roombex.Mixfile do
   def project do
     [
       app: :roombex,
-     version: "0.0.5",
+     version: "0.0.6",
      elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps,
-     package: package,
+     deps: deps(),
+     package: package(),
      description: """
        Implements the Roomba binary protocol. Send and receive binary data using elixir data structures and simple functions.
        """,

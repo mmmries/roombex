@@ -12,7 +12,8 @@ defmodule Roombex.StateText do
     state = %State{expected_sensor_packets: [:light_bumper_left_signal]}
     state = State.update(state, <<3>>)
     state = State.update(state, <<61>>)
-    assert %{expected_sensor_packets: [], sensors: %{light_bumper_left_signal: 829 / 4095.0}} = state
+    expected = 829 / 4095.0
+    assert %{expected_sensor_packets: [], sensors: %{light_bumper_left_signal: ^expected}} = state
   end
 
   test "receiving extra data is a no-op" do

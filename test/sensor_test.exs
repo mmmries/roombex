@@ -3,16 +3,20 @@ defmodule Roombex.SensorTest do
   alias Roombex.Sensor
 
   test "parsing light bumper signal packets" do
-    assert %{light_bumper_left_signal: 88.0 / 4095.0} = Sensor.parse(:light_bumper_left_signal, <<0,88>>)
-    assert %{light_bumper_right_center_signal: 829 / 4095.0} = Sensor.parse(:light_bumper_right_center_signal, <<3,61>>)
+    expected = 88.0 / 4095.0
+    assert %{light_bumper_left_signal: ^expected} = Sensor.parse(:light_bumper_left_signal, <<0,88>>)
+    expected = 829 / 4095.0
+    assert %{light_bumper_right_center_signal: ^expected} = Sensor.parse(:light_bumper_right_center_signal, <<3,61>>)
   end
 
   test "cliff_left_signal" do
-    assert %{cliff_left_signal: 537 / 4095.0} = Sensor.parse(:cliff_left_signal, << 2, 25 >>)
+    expected = 537 / 4095.0
+    assert %{cliff_left_signal: ^expected} = Sensor.parse(:cliff_left_signal, << 2, 25 >>)
   end
 
   test "cliff_right_front_signal" do
-    assert %{cliff_right_front_signal: 1049 / 4095.0} = Sensor.parse(:cliff_right_front_signal, << 4, 25 >>)
+    expected = 1049 / 4095.0
+    assert %{cliff_right_front_signal: ^expected} = Sensor.parse(:cliff_right_front_signal, << 4, 25 >>)
   end
 
   test "parsing current packets" do
