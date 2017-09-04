@@ -55,11 +55,9 @@ defmodule Roombex do
 
   defp leds_byte([], byte), do: byte
   defp leds_byte([:dirt_detect|tail], byte), do: leds_byte(tail, byte ||| 1)
-  defp leds_byte([:max|tail], byte), do: leds_byte(tail, byte ||| 2)
-  defp leds_byte([:clean|tail], byte), do: leds_byte(tail, byte ||| 4)
-  defp leds_byte([:spot|tail], byte), do: leds_byte(tail, byte ||| 8)
-  defp leds_byte([:status_red|tail], byte), do: leds_byte(tail, byte ||| 16)
-  defp leds_byte([:status_green|tail], byte), do: leds_byte(tail, byte ||| 32)
+  defp leds_byte([:spot|tail], byte), do: leds_byte(tail, byte ||| 2)
+  defp leds_byte([:dock|tail], byte), do: leds_byte(tail, byte ||| 4)
+  defp leds_byte([:warning|tail], byte), do: leds_byte(tail, byte ||| 8)
 
   defp notes_bytes([], bytes), do: bytes
   defp notes_bytes([ [note, duration] | tail ], bytes) when note >= 31 and note <= 127 and duration >= 0.0 and duration <= 3.99 do
