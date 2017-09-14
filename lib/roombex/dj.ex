@@ -24,6 +24,7 @@ defmodule Roombex.DJ do
     # who should receive status updates?
     report_to = Keyword.get(opts, :report_to, nil)
     send self(), :safe_mode
+    :timer.send_interval(500, :broadcast_sensors)
     {:ok, %{serial: serial, roomba: %State{}, report_to: report_to}}
   end
 
@@ -45,6 +46,10 @@ defmodule Roombex.DJ do
     {:noreply, state}
   end
 
+  def handle_info(:broadcast_sensors, %{roomba: roomba}=state) do
+    report_sensor_change(roomba, state)
+    {:noreply, state}
+  end
   def handle_info({:nerves_uart, _uart, data}, %{roomba: roomba}=state) do
     old_sensors = roomba.sensors
     roomba = Roombex.State.update(roomba, data)
