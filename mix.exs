@@ -17,6 +17,7 @@ defmodule Roombex.Mixfile do
         main: "readme",
         extras: ["README.md"],
       ],
+      dialyzer: [plt_add_deps: :apps_direct, plt_add_apps: [:nerves_uart]],
     ]
   end
 
@@ -28,7 +29,8 @@ defmodule Roombex.Mixfile do
   defp deps do
     [
       {:nerves_uart, "~> 0.1.2", optional: true},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
     ]
   end
 
