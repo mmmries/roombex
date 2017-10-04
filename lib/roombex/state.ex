@@ -101,6 +101,7 @@ defmodule Roombex.State do
             unparsed_binary: <<>>
   import Roombex.Sensor, only: [parse: 2, packet_size: 1]
 
+  @spec update(%Roombex.State{}, binary()) :: %Roombex.State{}
   def update(%Roombex.State{sensors: sensors}=state, binary) do
     binary = state.unparsed_binary <> binary
     {parsed_sensor_values, unparsed_binary, unparsed_packets} = parse_expected_updates(binary, state.expected_sensor_packets)

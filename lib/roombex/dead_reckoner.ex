@@ -5,6 +5,7 @@ defmodule Roombex.DeadReckoner do
   @near_upper_bound @max_encoder_count - 5000
   @near_lower_bound 5000
 
+  @spec update(%WhereAmI{}, %{encoder_counts_left: non_neg_integer(), encoder_counts_right: non_neg_integer()}) :: %WhereAmI{}
   def update(%WhereAmI{}=whereami, %{encoder_counts_left: left, encoder_counts_right: right}) do
     left_diff = encoder_diff(whereami.encoder_counts_left, left)
     right_diff = encoder_diff(whereami.encoder_counts_right, right)
