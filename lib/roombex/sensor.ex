@@ -56,8 +56,10 @@ defmodule Roombex.Sensor do
     light_bumper_signals: %{id: 106},
   }
 
+  @spec packet_size(atom()) :: non_neg_integer()
   def packet_size(packet) when is_atom(packet), do: Map.fetch!(@packets, packet)[:bytes]
 
+  @spec packet_id(atom()) :: non_neg_integer()
   def packet_id(packet) when is_atom(packet) do
     case Map.get(@packets, packet) do
       %{id: id} -> id
@@ -65,6 +67,7 @@ defmodule Roombex.Sensor do
     end
   end
 
+  @spec parse(atom(), binary()) :: map()
   def parse(:bumps_and_wheeldrops, binary) do
     << _rest::size(4),
        wheel_drop_left::unsigned-size(1),

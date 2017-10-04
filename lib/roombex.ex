@@ -2,38 +2,73 @@ defmodule Roombex do
   use Bitwise
   alias Roombex.Sensor
 
+  @spec baud(non_neg_integer()) :: binary()
   def baud(rate), do: << 129, baud_code(rate) >>
+
+  @spec clean() :: binary()
   def clean, do: << 135 >>
+
+  @spec control() :: binary()
   def control, do: << 130 >>
+
+  @spec drive(:straight | :stop | :turn_clockwise | :turn_counter_clockwise) :: binary()
   def drive(:straight), do: << 137, 8, 0, 0, 0 >>
   def drive(:stop), do: << 137 >> <> velocity_bytes(0) <> radius_bytes(0)
   def drive(:turn_clockwise), do: << 137, 255, 255, 255, 255 >>
   def drive(:turn_counter_clockwise), do: << 137, 0, 0, 0, 1 >>
+
+  @spec drive(non_neg_integer(), non_neg_integer()) :: binary()
   def drive(velocity_mm_per_sec, radius_mm) do
     << 137 >> <> velocity_bytes(velocity_mm_per_sec) <> radius_bytes(radius_mm)
   end
+
+  @spec force_seeking_dock() :: binary()
   def force_seeking_dock, do: << 143 >>
+
+  @spec full() :: binary()
   def full, do: << 132 >>
+
+  @spec leds([atom()], float(), float()) :: binary()
   def leds(leds, power_color, power_intensity) do
     << 139, leds_byte(leds, 0), float_to_byte(power_color), float_to_byte(power_intensity) >>
   end
+
+  @spec max() :: binary()
   def max, do: << 136 >>
+
+  @spec motors([atom()]) :: binary()
   def motors(which_motors), do: << 138, motors_byte(which_motors, 0) >>
+
+  @spec play(non_neg_integer()) :: binary()
   def play(number) when number >= 0 and number <= 15 do
     << 141, number >>
   end
+
+  @spec power() :: binary()
   def power, do: << 133 >>
+
+  @spec reset() :: binary()
   def reset, do: << 7 >>
+
+  @spec sensors(non_neg_integer() | atom()) :: binary()
   def sensors(packet_group) when packet_group in 0..255, do: << 142, packet_group >>
   def sensors(packet) when is_atom(packet) do
     packet_id = Sensor.packet_id(packet)
     << 142, packet_id >>
   end
+
+  @spec safe() :: binary()
   def safe, do: << 131 >>
+
+  @spec song(non_neg_integer(), list([...])) :: binary()
   def song(number, notes) when number >= 0 and number <= 15 and length(notes) <= 16 do
     << 140, number, length(notes) >> <> notes_bytes(notes, << >>)
   end
+
+  @spec spot() :: binary()
   def spot, do: << 134 >>
+
+  @spec start() :: binary()
   def start, do: << 128 >>
 
   defp baud_code(300), do: 0
