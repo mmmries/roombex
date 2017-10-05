@@ -12,6 +12,9 @@ defmodule Roombex.DJ do
     GenServer.start_link(__MODULE__, dj_opts, process_opts)
   end
 
+  @spec check_sensors(GenServer.server, [atom()], non_neg_integer()) :: %Roombex.State.Sensors{}
+  def check_sensors(pid \\ __MODULE__, sensor_packets, timeout \\ 100), do: GenServer.call(pid, {:check_sensors, sensor_packets}, timeout)
+
   @spec command(GenServer.server, binary()) :: :ok
   def command(pid \\ __MODULE__, binary), do: GenServer.cast(pid, {:command, binary})
 
@@ -28,15 +31,20 @@ defmodule Roombex.DJ do
     {:ok, serial} = UART.start_link()
     :ok = UART.open(serial, tty, speed: @baud_rate, active: true)
     # who should receive status updates?
-    report_to = Keyword.get(opts, :report_to, nil)
     send self(), :safe_mode
-    :timer.send_interval(500, :broadcast_sensors)
-    {:ok, %{serial: serial, roomba: %State{}, report_to: report_to}}
+    {:ok, %{serial: serial, roomba: %State{}}}
   end
 
   @impl GenServer
   def handle_call(:sensors, _from, %{roomba: %State{sensors: sensors}}=state) do
     {:reply, sensors, state}
+  end
+  @impl GenServer
+  def handle_call({:check_sensors, sensor_packets}, from, %{roomba: roomba}=state) do
+    Enum.each(sensor_packets, &(UART.write(state.serial, Roombex.sensors(&1))))
+    new_roomba = Map.put(roomba, :expected_sensor_packets, sensor_packets)
+    state = state |> Map.put(:roomba, new_roomba) |> Map.put(:sensor_client, from)
+    {:noreply, state}
   end
 
   @impl GenServer
@@ -56,25 +64,12 @@ defmodule Roombex.DJ do
   end
 
   @impl GenServer
-  def handle_info(:broadcast_sensors, %{roomba: roomba}=state) do
-    report_sensor_change(roomba, state)
-    {:noreply, state}
-  end
-  @impl GenServer
-  def handle_info({:nerves_uart, _uart, data}, %{roomba: roomba}=state) do
-    old_sensors = roomba.sensors
+  def handle_info({:nerves_uart, _uart, data}, %{roomba: roomba, sensor_client: client}=state) do
     roomba = Roombex.State.update(roomba, data)
-    if ! Map.equal?(old_sensors, roomba.sensors) do
-      report_sensor_change(roomba, state)
+    if roomba.expected_sensor_packets == [] do
+      GenServer.reply(client, roomba.sensors)
     end
     {:noreply, %{state | roomba: roomba}}
-  end
-  @impl GenServer
-  def handle_info({:check_on, sensor_packets}, %{serial: device, roomba: roomba}=state) do
-    Enum.each(sensor_packets, &(UART.write(device, Roombex.sensors(&1))))
-    # note: rather than handling the case of a faulty UART connection to the roomba, we just ignore old requests that weren't fulfilled
-    new_roomba = Map.put(roomba, :expected_sensor_packets, sensor_packets)
-    {:noreply, %{state | roomba: new_roomba}}
   end
   @impl GenServer
   def handle_info(:safe_mode, %{serial: serial}=state) do
@@ -88,11 +83,5 @@ defmodule Roombex.DJ do
   def handle_info(msg, state) do
     Logger.error "DJ ROOMBEX :: UNEXPECTED MESSAGE :: #{inspect msg}"
     {:noreply, state}
-  end
-
-  # Private Functions
-  defp report_sensor_change(_roomba, %{report_to: nil}), do: nil #no one to report to
-  defp report_sensor_change(roomba, %{report_to: report_to}) do
-    send report_to, {:roomba_status, roomba.sensors}
   end
 end
